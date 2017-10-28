@@ -89,19 +89,20 @@ docker run \
 This documents is a guide to install RHMAP on Openshift using ‘oc cluster up’.
 **Caveat:** There are some steps that are optional and others are in this document because of a bad behaviour that could be fixed in the future.
 Using oc-cluster-wrapper to manage configurations
-We’re going to use oc-cluster-wrapper as a convenient way to provide persistence to ‘oc cluster up’ and also to manage different cluster configurations in the same machine.
-**Note:** persistence itself is a matter of setting some parameters correctly as explained here
+We’re going to use [oc-cluster-wrapper](https://github.com/openshift-evangelists/oc-cluster-wrapper) as a convenient way to provide persistence to ‘oc cluster up’ and also to manage different cluster configurations in the same machine.
+**Note:** persistence itself is a matter of setting some parameters correctly as explained [here](https://stackoverflow.com/questions/41539780/making-openshift-origin-docker-containers-persistent-after-reboot)
 
 But before we start up our cluster we need to create a network interface alias in an interface different to loopback for two reasons:
 Apparently RHMAP installation fails if IP is like 127.x.x.x
 You want to be able to start your cluster in the same IP always
 
 Next we’ll download ‘oc-cluster-wrapper’ (or clone its repository) and create a cluster.
-Create an IP alias
-Go here for a longer explanation, next example creates an IP alias for interface en0.
-$ sudo ifconfig en0 alias 192.168.50.100 255.255.255.0
+
+## Create an IP alias
+Go [here](http://osxdaily.com/2009/08/05/how-to-create-an-ip-alias-in-mac-os-x-using-ifconfig/) for a longer explanation, next example creates an IP alias for interface **en0**.
+``$ sudo ifconfig **en0** alias 192.168.50.100 255.255.255.0``
 Clone ‘
-Create your OCP cluster
+## Create your OCP cluster
 Change dir to oc-cluster-wrapper (or put it in your PATH)
 $ cd /Users/cvicensa/Projects/openshift/oc-up-rhmap/oc-cluster-wrapper
 
