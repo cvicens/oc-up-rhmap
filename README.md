@@ -100,7 +100,9 @@ Next we’ll download ‘oc-cluster-wrapper’ (or clone its repository) and cre
 
 ## Create an IP alias
 Go [here](http://osxdaily.com/2009/08/05/how-to-create-an-ip-alias-in-mac-os-x-using-ifconfig/) for a longer explanation, next example creates an IP alias for interface **en0**.
-``$ sudo ifconfig **en0** alias 192.168.50.100 255.255.255.0``
+
+```$ sudo ifconfig **en0** alias 192.168.50.100 255.255.255.0```
+
 Clone ‘
 ## Create your OCP cluster
 Change dir to oc-cluster-wrapper (or put it in your PATH)
