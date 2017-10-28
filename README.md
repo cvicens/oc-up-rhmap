@@ -1,4 +1,4 @@
-Primero modificar 
+# Primero modificar 
 
 
 
@@ -85,12 +85,12 @@ docker run \
   -p 7443:443 \
   --rm pierreprinetti/certbot:latest
 
-Intro
+# Intro
 This documents is a guide to install RHMAP on Openshift using ‘oc cluster up’.
-Caveat: There are some steps that are optional and others are in this document because of a bad behaviour that could be fixed in the future.
+**Caveat:** There are some steps that are optional and others are in this document because of a bad behaviour that could be fixed in the future.
 Using oc-cluster-wrapper to manage configurations
 We’re going to use oc-cluster-wrapper as a convenient way to provide persistence to ‘oc cluster up’ and also to manage different cluster configurations in the same machine.
-Note: persistence itself is a matter of setting some parameters correctly as explained here
+**Note:** persistence itself is a matter of setting some parameters correctly as explained here
 
 But before we start up our cluster we need to create a network interface alias in an interface different to loopback for two reasons:
 Apparently RHMAP installation fails if IP is like 127.x.x.x
