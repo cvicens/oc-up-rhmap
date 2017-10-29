@@ -87,9 +87,11 @@ docker run \
 
 # Intro
 This documents is a guide to install RHMAP on Openshift using ‘oc cluster up’.
+
 **Caveat:** There are some steps that are optional and others are in this document because of a bad behaviour that could be fixed in the future.
 Using oc-cluster-wrapper to manage configurations
 We’re going to use [oc-cluster-wrapper](https://github.com/openshift-evangelists/oc-cluster-wrapper) as a convenient way to provide persistence to ‘oc cluster up’ and also to manage different cluster configurations in the same machine.
+
 **Note:** persistence itself is a matter of setting some parameters correctly as explained [here](https://stackoverflow.com/questions/41539780/making-openshift-origin-docker-containers-persistent-after-reboot)
 
 But before we start up our cluster we need to create a network interface alias in an interface different to loopback for two reasons:
@@ -106,7 +108,7 @@ Go [here](http://osxdaily.com/2009/08/05/how-to-create-an-ip-alias-in-mac-os-x-u
 ## Clone or download oc-cluster-wrapper
 Go to [oc-cluster-wrapper](https://github.com/openshift-evangelists/oc-cluster-wrapper) and follow instructions.
 
-## Create your OCP cluster
+## Create your OCP cluster to install RHMAP on top
 Change dir to oc-cluster-wrapper (or put it in your PATH) and start up your cluster… in this case name is **rhmap4.4** and IP is **192.168.50.100**.
 
 ```
@@ -140,19 +142,77 @@ cvicensa-mbp:oc-cluster-wrapper cvicensa$ ./oc-cluster list
 # Using client for origin v3.6.0
 Profiles:
 - rhmap4.4
-cvicensa-mbp:oc-cluster-wrapper cvicensa$ ./oc-cluster console
+```
+
+So far we have created and stored an OCP configuration for 'oc cluster up' with a given name we can use to start/stop our cluster at any time.
+
+If you need to see the console URL afterwards, run the following command.
+
+```
+$ ./oc-cluster console
 # Using client for origin v3.6.0
 https://192.168.50.100:8443/console
+```
+
+# Installing RHMAP with Ansible playbooks
+
+We're going to install RHMAP using ansible playbooks in [github/fheng/rhmap-ansible](https://github.com/fheng/rhmap-ansible), in fact we're going to use ./rhmap-ansible/playbooks/poc.yml. In order to do so we'll need to select/create an ansible inventory and override the default paths to find the templates to install RHMAP. These templates can by found by default at /opt/rhmap/{{ rhmap_version }}/templates/core for '**core**' and at /opt/rhmap/{{ rhmap_version }}/templates/mbaas for '**mbaas**', by default I mean if you follow the steps to install RHMAP using yum (``yum install rhmap-fh-openshift-templates``) [here](https://access.redhat.com/documentation/en-us/red_hat_mobile_application_platform/4.5/html/installing_rhmap/preparing-infrastructure-for-installation#install-openshift-templates).
+
+Let's clone (remember you need access to fheng git repo) the rhmap-ansible repo.
+
+```
+$ git clone https://github.com/fheng/rhmap-ansible
+```
+
+Before we run our playbook we need to setup the ansible inventory. To do so, we're going to use ``./rhmap-ansible/inventory-templates/fh-cup-example``, edit the file with your favorite editor and change the variables '**login_url**' and '**master_url**' to point to your OCP cluster. If you have created the IP alias these variables should point to https://<IP_ALIAS>:8443 as in the following excerpt.
+
+```
+...
+login_url="https://192.168.50.100:8443"
+...
+master_url="https://192.168.50.100:8443"
+...
+```
+
+Additionally you can change the values of the variables that point to the build farm in ``./roles/deploy-core/defaults/main.yml`` as in the following excerpt. In our case both variables should point to ``https://farm.eu.redhatmobile.com``. It is possible to change this later. 
+
+```yaml
+frontend:
+  ...
+  git_external_protocol: "https"
+  builder_android_service_host: "https://androidbuild.feedhenry.com"
+  builder_ios_service_host: "https://iosbuild.feedhenry.com"
 
 ```
 
+# Create a secret to hold docker hub credentials and link it to the default account for pulling images
+
+First we need to create a secret (**rhmap-dockerio** in our example) with our docker hub credentials (you have to be added to organization 'rhmap' in order to be able to pull all the needed images). Next example shows how to create the secret.
+
+```
+$ oc secrets new-dockercfg rhmap-dockerio  --docker-server=https://index.docker.io/v1/ --docker-username=<DOCKER_USER> --docker-password=<DOCKER_PASS> --docker-email=<DOCKER_EMAIL>
+
+```
+
+Now let's link the secret '**rhmap-dockerio**' to the default account for pulling images.
+
+```
+oc secrets link default rhmap-dockerio --for=pull
+```
+
+# Execute the poc.yml ansible playbook
+
+```
+$ cd ./rhmap-ansible
+$ ansible-playbook -i inventory-templates/fh-cup-example playbooks/poc.yml -e "core_templates_dir=/Users/cvicensa/Projects/openshift/oc-up-rhmap/fh-core-openshift-templates/generated" -e "mbaas_templates_dir=/Users/cvicensa/Projects/openshift/oc-up-rhmap/fh-openshift-templates" -e "mbaas_project_name=mbaas" -e "core_project_name=core" -e "strict_mode=false" --tags deploycvicensa-mbp:oc-up-rhmap cvicensa
+```
+
+The installation can get stuck at 'ups' application deployment in project 'core', if that is the case Ctrl+C and re run the script.
 
 
 
 
 
 
-
-farm.eu.redhatmobile.com
 
 
