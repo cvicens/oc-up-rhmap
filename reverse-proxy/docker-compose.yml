@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+    reverseproxy:
+        image: rhmap/rhmap-reverse-proxy:v1.0
+        ports:
+            - 8043:8043
+#            - 8080:8080
+#            - 8081:8081
+        restart: always
+        volumes:
+          - ./nginx-log:/var/log/nginx
+          - ./nginx-ssl:/etc/ssl
+
+#    nginx:
+#        depends_on:
+#            - reverseproxy
+#        image: nginx:alpine
+#        restart: always
+
+#    apache:
+#        depends_on:
+#            - reverseproxy
+#        image: httpd:alpine
+#        restart: always
+
+#    volumes:
+#      nginx-log:
+#        driver: local

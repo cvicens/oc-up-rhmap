@@ -207,7 +207,38 @@ $ cd ./rhmap-ansible
 $ ansible-playbook -i inventory-templates/fh-cup-example playbooks/poc.yml -e "core_templates_dir=/Users/cvicensa/Projects/openshift/oc-up-rhmap/fh-core-openshift-templates/generated" -e "mbaas_templates_dir=/Users/cvicensa/Projects/openshift/oc-up-rhmap/fh-openshift-templates" -e "mbaas_project_name=mbaas" -e "core_project_name=core" -e "strict_mode=false" --tags deploycvicensa-mbp:oc-up-rhmap cvicensa
 ```
 
-The installation can get stuck at 'ups' application deployment in project 'core', if that is the case Ctrl+C and re run the script.
+The installation can get stuck at 'ups' application deployment in project 'core', if that is the case Ctrl+C and re-run the script.
+
+# Create your own CA with CFSSL
+In order to create our own CA we're going to use a docker image including CFSSL (Cloud Fare SSL) ].
+
+In our GIT repository there is a sample configuration file to generate our custom CA. Please go to ./ca and change ca.json to meet your needs, or just change the CN attribute to something meaningful for you.
+
+Before running any command be sure you're at the repo level, if so, you should be able to run the following command susccesfully.
+
+```
+$ cat ./ca/ca.json
+{
+    "key": {
+        "algo": "rsa",
+        "size": 4096
+    },
+    "CN": "RHM CA"
+}
+```
+
+Now change ./ca/ca.json or create a new one (and change the following command accordingly).
+
+```
+$ docker run --rm -v $(pwd)/ca:/etc/cfssl dhiltgen/cfssl genkey -initca ca.json | \
+> docker run --rm -i -v $(pwd)/ca:/etc/cfssl --entrypoint cfssljson dhiltgen/cfssl -bare ca
+```
+
+# Generate your wildcard cert for the proxy
+
+# Deploy nginx and setup certs...
+
+
 
 
 
