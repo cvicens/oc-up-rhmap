@@ -10,6 +10,9 @@ IP_ADDRESS=$1
 #CURRENT_DIR=$(pwd)
 NEW_CERT_DIR=./proxy-certs/wildcard.apps.$IP_ADDRESS.nip.io
 
+SERVER_CRT_DIR=../../nginx-ssl/certs
+SERVER_KEY_DIR=../../nginx-ssl/private
+
 mkdir $NEW_CERT_DIR
 cd $NEW_CERT_DIR
 
@@ -32,7 +35,10 @@ EOF
 
 docker run --rm --link=cfssl -v $(pwd):/etc/cfssl --entrypoint=/bin/sh dhiltgen/cfssl -c 'cfssl gencert -remote $CFSSL_PORT_8888_TCP_ADDR -profile=server mycert.json' | docker run --rm -i -v $(pwd):/etc/cfssl --entrypoint cfssljson dhiltgen/cfssl -bare mycert
 
-cp mycert.pem ../../nginx-ssl/certs/server.pem 
-cp mycert-key.pem ../../nginx-ssl/private/server.key 
+mkdir -p $SERVER_CRT_DIR
+mkdir -p $SERVER_KEY_DIR
+
+cp mycert.pem $SERVER_CRT_DIR/server.pem
+cp mycert-key.pem $SERVER_KEY_DIR/server.key
 
 #cd $CURRENT_DIR
