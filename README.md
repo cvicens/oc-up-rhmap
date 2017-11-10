@@ -109,7 +109,7 @@ Go [here](http://osxdaily.com/2009/08/05/how-to-create-an-ip-alias-in-mac-os-x-u
 Go to [oc-cluster-wrapper](https://github.com/openshift-evangelists/oc-cluster-wrapper) and follow instructions.
 
 ## Create your OCP cluster to install RHMAP on top
-Change dir to oc-cluster-wrapper (or put it in your PATH) and start up your cluster… in this case name is **rhmap4.4** and IP is **192.168.50.100**.
+Change dir to oc-cluster-wrapper (or put it in your PATH) and start up your cluster… in this case cluster name is **rhmap4.4** and IP is **192.168.50.100**.
 
 ```
 $ ./oc-cluster up rhmap4.4  --public-hostname=192.168.50.100
@@ -158,7 +158,7 @@ https://192.168.50.100:8443/console
 
 We're going to install RHMAP using ansible playbooks in [github/fheng/rhmap-ansible](https://github.com/fheng/rhmap-ansible), in fact we're going to use ./rhmap-ansible/playbooks/poc.yml. In order to do so we'll need to select/create an ansible inventory and override the default paths to find the templates to install RHMAP. These templates can by found by default at /opt/rhmap/{{ rhmap_version }}/templates/core for '**core**' and at /opt/rhmap/{{ rhmap_version }}/templates/mbaas for '**mbaas**', by default I mean if you follow the steps to install RHMAP using yum (``yum install rhmap-fh-openshift-templates``) [here](https://access.redhat.com/documentation/en-us/red_hat_mobile_application_platform/4.5/html/installing_rhmap/preparing-infrastructure-for-installation#install-openshift-templates).
 
-Let's clone (remember you need access to fheng git repo) the rhmap-ansible repo.
+Let's clone (remember, you need access to fheng git repo to do this) the rhmap-ansible repo. Just to make it easier, please clone at the same level of this README.md file where you will also find ``rhmap-cup-install.sh``
 
 ```
 $ git clone https://github.com/fheng/rhmap-ansible
@@ -187,7 +187,7 @@ frontend:
 
 # Create a secret to hold docker hub credentials and link it to the default account for pulling images
 
-First we need to create a secret (**rhmap-dockerio** in our example) with our docker hub credentials (you have to be added to organization 'rhmap' in order to be able to pull all the needed images). Next example shows how to create the secret.
+First we need to create a secret (**rhmap-dockerio** in our example) with our docker hub credentials (you need to to be added to organization 'rhmap' in order to be able to pull all the needed images). Next example shows how to create the secret.
 
 ```
 $ oc secrets new-dockercfg rhmap-dockerio  --docker-server=https://index.docker.io/v1/ --docker-username=<DOCKER_USER> --docker-password=<DOCKER_PASS> --docker-email=<DOCKER_EMAIL>
@@ -197,7 +197,7 @@ $ oc secrets new-dockercfg rhmap-dockerio  --docker-server=https://index.docker.
 Now let's link the secret '**rhmap-dockerio**' to the default account for pulling images.
 
 ```
-oc secrets link default rhmap-dockerio --for=pull
+$ oc secrets link default rhmap-dockerio --for=pull
 ```
 
 # Execute the poc.yml ansible playbook
